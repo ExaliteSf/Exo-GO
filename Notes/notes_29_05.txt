@@ -1,0 +1,83 @@
+Types de base
+
+int : 32 ou 64 bits selon la plateforme (recommandé)
+int8/16/32/64, uint, uint8/byte, float32/64
+string : UTF-8 natif (emojis, accents, kanji)
+bool, byte = uint8 (ASCII/binaire), rune = int32 (Unicode)
+Typage statique : type connu à la compilation, pas de surprise à l'exécution
+Pas de conversion implicite : var x int = 3.14 ne compile pas (évite les bugs Ariane 5)
+
+
+Variables
+
+3 façons : var x int = 5 / var x = 5 (inférence) / x := 5 (court, fonctions seulement)
+Déclarations groupées : var ( serveur string = "localhost"; port int = 8080 )
+Plusieurs à la fois : x, y := 10, 20
+Échange sans variable temp : x, y = y, x
+Variable non utilisée = erreur de compilation (protection variables fantômes)
+
+
+Constantes & iota
+
+const Pi float64 = 3.14 — immuable, typée ou non
+iota s'incrémente à chaque constante dans un bloc const()
+Exemple énumération : DEBUG=0, INFO=1, WARNING=2, ERROR=3, CRITICAL=4
+Exemple calcul : Ko = 1 << (10 * (iota+1)) → 1024, 1048576...
+Exemple jours : Lundi = iota + 1 → commence à 1 au lieu de 0
+
+
+Fonctions
+
+Retours multiples : func divmod(a, b int) (int, int)
+Pattern idiomatique : (résultat, error) — erreur comme valeur, pas d'exception
+Retours nommés (naked return) : func stat() (min, max, moyenne float64)
+Variadique : func f(s ...string) — uniquement dans les fonctions
+Visibilité : majuscule = exporté, minuscule = privé au package
+Closures : capturent et modifient les variables de leur scope parent
+Chaque creerCompteur() crée un état indépendant
+
+
+Contrôle de flux
+
+for est la seule boucle en Go (remplace while, do-while, foreach)
+Classique : for i := 0; i < 5; i++
+Style while : for n < 100 { n *= 2 }
+Infini : for { ... break } — sortir avec break
+Range : for index, valeur := range fruits — ignorer index avec _
+Sur string : itère sur les runes (Unicode), pas les bytes
+if avec initialisation : if age := 20; age >= 18 — idiomatique en Go
+switch sans break implicite, fallthrough explicite si besoin
+defer : exécute à la fin de la fonction, même après le return
+
+
+Structs & méthodes
+
+Value receiver (p Produit) : travaille sur une copie, ne modifie pas l'original
+Pointer receiver (p *Produit) : modifie le vrai objet, Go gère & automatiquement
+Utiliser pointer receiver quand on veut modifier ou si la struct est grande
+Convention nommage : 1-2 lettres du type (p pour Produit)
+Embedding à la place de l'héritage — Go n'a pas de class
+Visibilité champ : Nom string exporté, stock int privé au package
+
+
+Collections
+
+Slice : append(slice, elem) pour ajouter
+Map déclarée mais non initialisée → runtime panic si écriture
+Vérifier existence clé : val, ok := m["clé"] — pattern idiomatique
+Map initialisée avec make ou littéral map[string]int{}
+
+
+Gestion d'erreurs
+
+Pas d'exceptions comme Java — erreur = valeur de retour explicite
+res, err := diviser(10, 3); if err != nil { return }
+Ignorer une valeur : resultat, _ := diviser(20, 4)
+Avantage : on voit visuellement qu'une opération peut échouer, pas de flux caché
+
+
+Modules & build
+
+go.mod : déclare le module et ses dépendances
+go build ./... : compile tous les packages du module récursivement
+go run pour exécuter directement sans binaire intermédiaire
